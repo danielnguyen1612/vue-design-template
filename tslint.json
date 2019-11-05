@@ -23,6 +23,7 @@
       "check-separator",
       "check-type",
       "check-module"
-    ]
+    ],
+    "no-console": [false, "log"]
   }
 }
