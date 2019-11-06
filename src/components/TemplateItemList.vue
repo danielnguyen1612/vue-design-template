@@ -1,5 +1,5 @@
 <template lang="pug">
-  draggable.list-unstyled.d-flex.m-0(:list="itemList", :group="{name: 'templateComponents', pull: 'clone', put: 'false'}", @end="onEnd")
+  draggable.list-unstyled.d-flex.m-0(:list="itemList", :group="{name: 'templateComponents', pull: 'clone', put: 'false'}", @end="onEnd", @choose="onChoose")
     .mr-3(v-for="item in itemList")
       template-item(:data="item")
 </template>
@@ -14,10 +14,25 @@ import Draggable from 'vuedraggable';
 })
 export default class TemplateItemList extends Vue {
     @Prop({required: true, default: []}) public itemList!: any[];
+    private mouseOffset: any = {};
     public onEnd(event: any): void {
         if (event.to.className === 'fake') {
-            this.$emit('dragEnd', {x: event.originalEvent.offsetX, y: event.originalEvent.offsetY});
+            const componentCoordinate = event.originalEvent;
+            const parentCoordinate = event.to.getBoundingClientRect();
+            this.$emit('dragEnd', {
+                x: componentCoordinate.x - parentCoordinate.x - this.mouseOffset.x,
+                y: componentCoordinate.y - parentCoordinate.y - this.mouseOffset.y,
+            });
         }
+    }
+
+    public onChoose(event: any): void {
+        const componentCoordinate = event.originalEvent;
+        const parentCoordinate = event.item.getBoundingClientRect();
+        this.mouseOffset = {
+            x: componentCoordinate.x - parentCoordinate.x,
+            y: componentCoordinate.y - parentCoordinate.y,
+        };
     }
 }
 </script>
