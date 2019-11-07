@@ -9,15 +9,15 @@
         .page.bg-white.mx-auto.position-relative
           draggable.fake(ref="page", :list="fakeComponentList", :group="{name: 'templateComponents'}", @change="handleCompDragChange")
           vue-draggable-resizable(
-            :w='item.width', :h='item.height',
-            :minWidth='COMPONENT_DEFAULT_WIDTH', :min-height='COMPONENT_DEFAULT_HEIGHT',
+            :w="item.width", :h="item.height",
+            :minWidth="COMPONENT_DEFAULT_WIDTH", :min-height="COMPONENT_DEFAULT_HEIGHT",
             :x="item.x", :y="item.y",
-            @dragstop='onDragStop',
-            @resizestop='onResizeStop',
-            :onDragStart='setCurrentComponent(item)',
-            :onResizeStart='setCurrentComponent(item)',
+            :handles="['mr', 'ml']"
+            @dragstop="onDragStop",
+            @resizestop="onResizeStop",
+            @activated="setCurrentComponent(item)",
             :parent="true",
-            :grid=[20,20],
+            :grid="[DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE]",
             v-for="item in currentComponentList")
             template-item(:data="item", @remove="removeComponent")
 </template>
@@ -29,7 +29,7 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import Draggable from 'vuedraggable';
 import TemplateItemList from '@/components/TemplateItemList.vue';
 import TemplateItem from '@/components/TemplateItem.vue';
-import { COMPONENT_DEFAULT_WIDTH, COMPONENT_DEFAULT_HEIGHT } from '@/constant';
+import { COMPONENT_DEFAULT_WIDTH, COMPONENT_DEFAULT_HEIGHT, DEFAULT_GRID_SIZE } from '@/constant';
 
 @Component({
     components: {TemplateItem, SideNav, TemplateItemList, VueDraggableResizable, Draggable },
@@ -37,6 +37,7 @@ import { COMPONENT_DEFAULT_WIDTH, COMPONENT_DEFAULT_HEIGHT } from '@/constant';
 export default class Home extends Vue {
   public COMPONENT_DEFAULT_WIDTH = COMPONENT_DEFAULT_WIDTH;
   public COMPONENT_DEFAULT_HEIGHT = COMPONENT_DEFAULT_HEIGHT;
+  public DEFAULT_GRID_SIZE = DEFAULT_GRID_SIZE;
   public currentComponent: any = {};
   public currentComponentList: any[] = [];
   public fakeComponentList: any[] = [];
@@ -70,16 +71,24 @@ export default class Home extends Vue {
 
   public onDragStop(x: number, y: number): void {
     const currentComponent = { ...this.currentComponent, x, y };
-    this.currentComponentList = [
+    if (currentComponent.x !== this.currentComponent.x || currentComponent.y !== this.currentComponent.y) {
+      this.currentComponentList = [
         ...this.currentComponentList.filter((item: any) => (item.id !== this.currentComponent.id)),
-        currentComponent];
+        currentComponent,
+      ];
+    }
   }
 
   public onResizeStop(left: number, top: number, width: number, height: number): void {
-    const currentComponent = { ...this.currentComponent, width, height};
-    this.currentComponentList = [
+    const currentComponent = { ...this.currentComponent, x: left, y: top, width, height};
+    if (currentComponent.width !== this.currentComponent.width
+        || currentComponent.height !== this.currentComponent.height
+    ) {
+      this.currentComponentList = [
         ...this.currentComponentList.filter((item: any) => (item.id !== this.currentComponent.id)),
-      currentComponent];
+        currentComponent,
+      ];
+    }
   }
 
   public setCurrentComponent(component: any): void {

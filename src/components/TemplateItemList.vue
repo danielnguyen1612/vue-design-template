@@ -8,9 +8,10 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import TemplateItem from '@/components/TemplateItem.vue';
 import Draggable from 'vuedraggable';
+import { processCoordinate } from '@/utils';
 
 @Component({
-    components: {TemplateItem, Draggable},
+    components: { TemplateItem, Draggable },
 })
 export default class TemplateItemList extends Vue {
     @Prop({required: true, default: []}) public itemList!: any[];
@@ -20,8 +21,8 @@ export default class TemplateItemList extends Vue {
             const componentCoordinate = event.originalEvent;
             const parentCoordinate = event.to.getBoundingClientRect();
             this.$emit('dragEnd', {
-                x: Math.round(componentCoordinate.x - parentCoordinate.x - this.mouseOffset.x),
-                y: Math.round(componentCoordinate.y - parentCoordinate.y - this.mouseOffset.y),
+                x: processCoordinate(Math.round(componentCoordinate.x - parentCoordinate.x - this.mouseOffset.x)),
+                y: processCoordinate(Math.round(componentCoordinate.y - parentCoordinate.y - this.mouseOffset.y)),
             });
         }
     }
