@@ -1,7 +1,8 @@
 <template lang="pug">
   .border.rounded.px-2.py-1
-    p.d-block {{data.label}}
+    .d-block.mb-1 {{data.label}}
     input.form-control(:id="data.id")
+    span(@click="$emit('remove', data)") &times;
 </template>
 
 <script lang="ts">
@@ -14,8 +15,20 @@ export default class TemplateComponent extends Vue {
 
 <style lang="scss" scoped>
   div {
+    position: relative;
+
     * {
       cursor: pointer;
+    }
+
+    span {
+      position: absolute;
+      right: 0;
+      top: -25px;
+    }
+
+    input {
+      height: 30px;
     }
   }
 </style>

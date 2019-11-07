@@ -20,8 +20,8 @@ export default class TemplateItemList extends Vue {
             const componentCoordinate = event.originalEvent;
             const parentCoordinate = event.to.getBoundingClientRect();
             this.$emit('dragEnd', {
-                x: componentCoordinate.x - parentCoordinate.x - this.mouseOffset.x,
-                y: componentCoordinate.y - parentCoordinate.y - this.mouseOffset.y,
+                x: Math.round(componentCoordinate.x - parentCoordinate.x - this.mouseOffset.x),
+                y: Math.round(componentCoordinate.y - parentCoordinate.y - this.mouseOffset.y),
             });
         }
     }
