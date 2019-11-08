@@ -2,14 +2,23 @@
   .border.rounded.px-2.py-1
     .d-block.mb-1 {{data.label}}
     input.form-control(:id="data.id")
-    span(@click="$emit('remove', data)") &times;
+    span(v-if="showCloseIcon", @click="$emit('remove', data)") &times;
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class TemplateComponent extends Vue {
-    @Prop({required: true, default: {}}) public data!: any;
+  @Prop({required: true, default: {}}) public data!: any;
+  @Prop({default: false}) public canRemove!: boolean;
+  @Prop({default: {}}) private currentComponent!: any;
+
+  public get showCloseIcon(): boolean {
+      if (!this.currentComponent) {
+          return false;
+      }
+      return this.currentComponent.id === this.data.id && this.canRemove;
+  }
 }
 </script>
 
@@ -23,8 +32,8 @@ export default class TemplateComponent extends Vue {
 
     span {
       position: absolute;
-      right: 0;
-      top: -25px;
+      right: 5px;
+      top: -5px;
     }
 
     input {

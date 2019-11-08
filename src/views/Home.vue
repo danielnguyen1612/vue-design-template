@@ -6,7 +6,11 @@
         h4 Component list
         template-item-list.component-list.overflow-auto(:itemList="templateComponentsList", @dragEnd="handleCompDragEnd")
       section.flex-grow-1.p-5.page-bg
-        .page.bg-white.mx-auto.position-relative
+        .controls.mx-auto.d-flex.justify-content-end
+          .form-check.form-check-inline.mr-0
+            input#showGrid.form-check-input(v-model="showGrid", type="checkbox")
+            label.form-check-label(for="showGrid") Show grid
+        .page.mx-auto.position-relative(:style="gridStyleObject")
           draggable.fake(ref="page", :list="fakeComponentList", :group="{name: 'templateComponents'}", @change="handleCompDragChange")
           vue-draggable-resizable(
             :w="item.width", :h="item.height",
@@ -16,10 +20,11 @@
             @dragstop="onDragStop",
             @resizestop="onResizeStop",
             @activated="setCurrentComponent(item)",
+            @deactivated="setCurrentComponent({})",
             :parent="true",
             :grid="[DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE]",
             v-for="item in currentComponentList")
-            template-item(:data="item", @remove="removeComponent")
+            template-item(:data="item", @remove="removeComponent", :canRemove="true", :currentComponent="currentComponent")
 </template>
 
 <script lang="ts">
@@ -38,6 +43,7 @@ export default class Home extends Vue {
   public COMPONENT_DEFAULT_WIDTH = COMPONENT_DEFAULT_WIDTH;
   public COMPONENT_DEFAULT_HEIGHT = COMPONENT_DEFAULT_HEIGHT;
   public DEFAULT_GRID_SIZE = DEFAULT_GRID_SIZE;
+  public showGrid: boolean = false;
   public currentComponent: any = {};
   public currentComponentList: any[] = [];
   public fakeComponentList: any[] = [];
@@ -69,26 +75,30 @@ export default class Home extends Vue {
   ];
   private componentIndex: number = 0;
 
+  public get gridStyleObject(): object {
+    return {
+      background: this.showGrid
+        ? `linear-gradient(-90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) 0% 0% / ${DEFAULT_GRID_SIZE}px ${DEFAULT_GRID_SIZE}px, linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px) 0% 0% / ${DEFAULT_GRID_SIZE}px ${DEFAULT_GRID_SIZE}px white`
+        : 'white',
+    };
+  }
+
   public onDragStop(x: number, y: number): void {
     const currentComponent = { ...this.currentComponent, x, y };
-    if (currentComponent.x !== this.currentComponent.x || currentComponent.y !== this.currentComponent.y) {
-      this.currentComponentList = [
-        ...this.currentComponentList.filter((item: any) => (item.id !== this.currentComponent.id)),
-        currentComponent,
-      ];
-    }
+    this.currentComponentList = [
+      ...this.currentComponentList.filter((item: any) => (item.id < currentComponent.id)),
+      currentComponent,
+      ...this.currentComponentList.filter((item: any) => (item.id > currentComponent.id)),
+    ];
   }
 
   public onResizeStop(left: number, top: number, width: number, height: number): void {
     const currentComponent = { ...this.currentComponent, x: left, y: top, width, height};
-    if (currentComponent.width !== this.currentComponent.width
-        || currentComponent.height !== this.currentComponent.height
-    ) {
-      this.currentComponentList = [
-        ...this.currentComponentList.filter((item: any) => (item.id !== this.currentComponent.id)),
-        currentComponent,
-      ];
-    }
+    this.currentComponentList = [
+      ...this.currentComponentList.filter((item: any) => (item.id < currentComponent.id)),
+      currentComponent,
+      ...this.currentComponentList.filter((item: any) => (item.id > currentComponent.id)),
+    ];
   }
 
   public setCurrentComponent(component: any): void {
@@ -129,6 +139,7 @@ export default class Home extends Vue {
     height: 29.7cm;
     width: 21cm;
     box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+    background: linear-gradient(-90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px) 0% 0% / 10px 10px, linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px) 0% 0% / 10px 10px white;
 
     .fake {
       opacity: 0;
@@ -139,6 +150,10 @@ export default class Home extends Vue {
   }
 
   .page-bg {
-    background: gray;
+    background: #ddd;
+  }
+
+  .controls {
+    width: 21cm;
   }
 </style>
