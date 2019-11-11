@@ -1,7 +1,7 @@
 <template lang="pug">
-  .border.rounded.px-2.py-1
-    .d-block.mb-1 {{data.label}}
-    input.form-control(:id="data.id")
+  div(:class="showBorderClass")
+    .input-label {{data.label}}
+    input(:id="data.id")
     span(v-if="showCloseIcon", @click="$emit('remove', data)") &times;
 </template>
 
@@ -11,7 +11,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class TemplateComponent extends Vue {
   @Prop({required: true, default: {}}) public data!: any;
   @Prop({default: false}) public canRemove!: boolean;
-  @Prop({default: {}}) private currentComponent!: any;
+  @Prop({default: false}) public showBorder!: boolean;
+  @Prop({default: () => ({})}) private currentComponent!: any;
+
+  public get showBorderClass(): string[] {
+      return this.showBorder ? ['border', 'px-2', 'py-1', 'rounded'] : [];
+  }
 
   public get showCloseIcon(): boolean {
       if (!this.currentComponent) {
@@ -38,6 +43,14 @@ export default class TemplateComponent extends Vue {
 
     input {
       height: 30px;
+      width: 100%;
+      border-radius: 3px;
+      border: 1px solid #ddd;
+    }
+
+    .input-label {
+      line-height: 15px;
+      margin-bottom: 5px;
     }
   }
 </style>

@@ -12,3 +12,14 @@
 
 // Vue draggable resizeable styles
 @import "~vue-draggable-resizable/dist/VueDraggableResizable.css";
+
+.design-page {
+  &.active {
+    outline: 1px dashed black;
+  }
+
+  .handle {
+    width: 5px;
+    height: 5px;
+  }
+}
