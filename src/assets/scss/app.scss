@@ -14,7 +14,8 @@
 @import "~vue-draggable-resizable/dist/VueDraggableResizable.css";
 
 .design-page {
-  &.active {
+  &.active,
+  &:hover {
     outline: 1px dashed black;
   }
 
